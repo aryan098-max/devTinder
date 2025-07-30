@@ -2,12 +2,16 @@ const express = require("express");
 
 const app = express();
 
-app.use("/",(req,res)=>{
-    res.send("Welcome to the main website")
+app.get("/user", (req, res)=>{
+    res.send({firstName:"Aryan", lastName:"Gupta"})
+});
+
+app.post("/user",(req,res)=>{
+    res.send("Data resolve successfully")
 })
 
-app.use("/jello",(req,res)=>{
-    res.send("Hello from the server")
+app.use("/",(req,res)=>{
+    res.send("Welcome to the main website of DevTinder");
 })
 
 app.listen(3000,()=>{
