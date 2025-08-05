@@ -1,27 +1,28 @@
 const express = require ("express");
+const adminAuth = require("../middleware/auth")
 
 const app = express ();
 
-app.get("/user",(req,res,next)=>{
-    console.log("First Handler");
-    // res.send("Hey"); First case
-    next();
-    // res.send("Hey"); Second case
-    /*
-        In the second case, first of all next() handler will execute the subsequent route handler, 
-        therefore, the response from the second route hander is sent to the client. 
+app.get("/admin/:id", (req,res,next)=>{
 
-        After, this second route handler is finished executing again res.send("Hey") is called which 
-        causes an error saying Headers are can't be set again. 
-     */
-    },
-
-    (req,res)=>{
-        console.log("second handler");
-        res.send("Hello");
+    const userId = req.params;
+    if(userId === 1){
+        next();
+    } else {
+        res.send("User credentials are wrong")
     }
-)
+})
+
+app.get("/admin/:id", (req,res,next)=>{
+    console.log("The admin credentials are correct");
+    res.send("Hey"); // First case
+})
+
+app.get("/user", (req,res,next)=>{
+    console.log("Second Hanlder");
+    res.send("Hello");
+})
 
 app.listen(3000, ()=>{
-    console.log("Port is running on 3000")
+    console.log("Port is running on 3000");
 })
