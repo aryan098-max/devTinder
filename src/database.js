@@ -1,28 +1,31 @@
 const express = require ("express");
-const adminAuth = require("../middleware/auth");
-const User = require("./models/user");
+const adminAuth = require("../middleware/auth")
+const User = require("./models/user")
 // this loc runs all the code inside the database.js
-const connectDB = require("../config/database");
+const connectDB = require("../config/database")
 const app = express ();
 
-// this middleware will run on every request sent by the user
-//  it parses the req.body into an obj
-app.use(express.json());
 
 app.post("/signup", async (req,res)=>{
 
-  // making things dynamic
-    const userData = new User(req.body);
-  
+  const userData = new User({
+    firstName:"Aryan",
+    lastName:"Gupta",
+    emailId:"aryan123@gmail.com",
+    password:"aryan@123",
+    age:23, 
+    gender:"Male"
+  })
+
   try{
+
     await userData.save();
-    res.send("User has been successfully added to the database");
+    res.send("User Data Added Successfully");
 
-  } catch(errr){
+  } catch(err){
 
-    res.status(500).send("Error Occured");
+    res.status(400).send(err.message);
   }
-
 })
 
 connectDB()
