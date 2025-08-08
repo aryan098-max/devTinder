@@ -9,6 +9,7 @@ const app = express ();
 //  it parses the req.body into an obj
 app.use(express.json());
 
+// ============================================================>
 app.post("/signup", async (req,res)=>{
 
   // making things dynamic
@@ -24,6 +25,86 @@ app.post("/signup", async (req,res)=>{
   }
 
 })
+// ============================================================>
+
+
+// ============================================================>
+app.get("/user", async (req,res)=>{
+  // getting email from the database using email
+  const userEmail = req.body.emailId;
+  try {
+    const user = await User.findOne({emailId:userEmail});
+    res.send(user);
+
+  } catch (err){
+
+    res.status(400).send("Error Occured");
+  }
+})
+// ============================================================>
+
+
+// ============================================================>
+app.get("/feed", async (req,res)=>{
+
+  try{
+
+    // returns array of obj
+    const allUser = await User.find({})
+    res.send(allUser);
+
+  } catch (err){
+
+    res.status(400).send(err.message);
+  }
+
+})
+// ============================================================>
+
+// ============================================================>
+app.delete("/user", async (req,res)=>{
+
+  const userId = req.body.userId;
+  console.log(userId);
+
+  try{
+    const user = await User.findByIdAndDelete({_id:userId});
+    console.log(user);
+    res.send("User was deleted");
+
+  }catch(err){
+
+    res.status(400).send("Error in the code");
+  }
+
+})
+
+// ============================================================>
+
+// ============================================================>
+
+  app.patch("/user", async(req,res)=>{
+
+    const userId = req.body.userId;
+    const data = req.body;
+
+    try{
+
+      // data will be sent in body by a user
+     const beforeUpdateUser =  await User.findByIdAndUpdate({_id:userId}, data, {returnDocument:"before"});
+     console.log(beforeUpdateUser);
+      res.send("User updated successfully");
+    } catch(err){
+
+      res.status(404).send("Error Occured in the code");
+    }
+
+  })
+
+
+// ============================================================>
+
+
 
 connectDB()
 .then(()=>{
