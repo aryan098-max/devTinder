@@ -42,6 +42,7 @@ const userSchema = new Schema({
     gender:{
         type:String,
         lowercase:true,
+        // gender validātion
         validate(value){
             if(!["male", "female","others"].includes(value)){
 
@@ -58,7 +59,12 @@ const userSchema = new Schema({
         default:"Nice to meet you"
     },
     skills:{
-        type:[String]
+        type:[String],
+        validate(value){
+            if(value.length > 15){
+                throw new Error ("You can't add more than 15 skills");
+            }
+        }
     }
 },{timestamps:true});
 

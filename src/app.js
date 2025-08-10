@@ -83,20 +83,30 @@ app.delete("/user", async (req,res)=>{
 
 // ============================================================>
 
-  app.patch("/user", async(req,res)=>{
+  app.patch("/user/:userId", async(req,res)=>{
 
-    const userId = req.body.userId;
+    const userId = req.params.userId;
     const data = req.body;
 
     try{
 
-      // data will be sent in body by a user
+    // update validation - API validations
+    const Allowed_Updates = ["userId", "password","skills","about","photo"];
+
+    const isUpdatesAllowed = Object.keys(data).every((k)=> Allowed_Updates.includes(k));
+
+    if(!isUpdatesAllowed){
+
+      throw new Error("You can't update this field");
+    }
+
+    // data will be sent in body by a user
      const beforeUpdateUser =  await User.findByIdAndUpdate({_id:userId}, data, {returnDocument:"before", runValidators:true});
-     console.log(beforeUpdateUser);
       res.send("User updated successfully");
+
     } catch(err){
 
-      res.status(404).send(err.message);
+      res.status(500).send(err.message);
     }
 
   })
