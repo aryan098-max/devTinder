@@ -1,7 +1,12 @@
 const express = require ("express");
-const adminAuth = require("../middleware/auth")
+const adminAuth = require("./middleware/auth")
 
 const app = express ();
+
+// When a ever a user sends a /admin request this middleware will run and admin is authenticated
+// This adminAuth has a next() handler which passes the control to the request handler
+// next() calls the next middleware on the sequence which is (req,res,next)
+app.use("/admin", adminAuth)
 
 app.get("/admin/:id", (req,res,next)=>{
 

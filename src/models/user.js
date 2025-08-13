@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-
 const {Schema} = mongoose;
+const validator = require("validator");
 
 const userSchema = new Schema({
 
@@ -12,7 +12,8 @@ const userSchema = new Schema({
     firstName:{
         type:String,
         required:true,
-        minlength:3
+        minlength:3, 
+        maxlength:10
     }, 
     lastName:{
         type: String,
@@ -25,14 +26,23 @@ const userSchema = new Schema({
         unique:true,
         lowercase:true,
         trim: true,
-        minlength:13
+        validate(value){
+            if(!(validator.isEmail(value) && value.endsWith(".com"))){
+                throw new Error ("Not a Valid Email: " + value);
+            }
+        }
 
     }, 
     password:{
         type: String,
         required:true,
-        minlength:5
-
+        minlength:5, 
+        validate(value){
+            
+            if(!validator.isStrongPassword(value)){
+                throw new Error ("Password Not Strong Enough: Add Characters Capital Letters")
+            }
+        }
     },
     age:{
         type:Number,
@@ -52,7 +62,12 @@ const userSchema = new Schema({
     },
     photo:{
         type:String,
-        default:""
+        default:"https://www.vectorstock.com/royalty-free-vector/default-profile-picture-avatar-user-icon-vector-46389216",
+        validate(value){
+            if(!validator.isURL(value)){
+                throw new Error ("URL is not Valid");
+            }
+        }
     },
     about:{
         type:String,

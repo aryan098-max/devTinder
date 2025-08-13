@@ -16,7 +16,6 @@ app.use(express.json());
 app.use(cookiePraser());
 
 // ============================================================>
-
 app.post("/signup", async (req,res)=>{
 
 
@@ -54,7 +53,9 @@ app.post("/login", async (req,res)=>{
   try{
 
     const {emailId, password} = req.body;
+
     const user = await User.findOne({emailId:emailId}); 
+
 
     if(!user){
       throw new Error ("User doesn't exist in the Database");
@@ -65,10 +66,11 @@ app.post("/login", async (req,res)=>{
     if(isPasswordValid){
 
       // creating a JSON WEB TOEKN
-       const token = jwt.sign({_id:user._id}, "Aryan@123", {expiresIn:"1d"})
+       const token = jwt.sign({_id:user._id}, "Aryan@123")
 
       // sending cookie
-      res.cookie("token", token, {expires:new Date(Date.now() + 24 * 60* 60 * 1000)});
+      res.cookie("token", token);
+
 
       res.send("Credentials Correct Login Successful");
     } else {
@@ -76,13 +78,13 @@ app.post("/login", async (req,res)=>{
       throw new Error ("Password is not correct");
     }
 
+
   } catch (err){
 
     res.status(500).send("Error " + err.message)
   }
-})
 
-// ============================================================>
+})
 
 app.get("/profile", userAuth, async (req, res)=>{
 
@@ -102,14 +104,88 @@ app.get("/profile", userAuth, async (req, res)=>{
 })
 
 // ============================================================>
+app.get("/user", async (req,res)=>{
+  // getting email from the database using email
+  const userEmail = req.body.emailId;
+  try {
+    const user = await User.findOne({emailId:userEmail});
+    res.send(user);
 
-app.post("/connectionRequest", userAuth, async (req, res)=>{
+  } catch (err){
 
-  const user = req.user;
+    res.status(400).send("Error Occured");
+  }
+})
+// ============================================================>
 
-  res.send(user.firstName + " sent the connection request");
+
+// ============================================================>
+app.get("/feed", async (req,res)=>{
+
+  try{
+
+    // returns array of obj
+    const allUser = await User.find({})
+    res.send(allUser);
+
+  } catch (err){
+
+    res.status(400).send(err.message);
+  }
 
 })
+// ============================================================>
+
+// ============================================================>
+app.delete("/user", async (req,res)=>{
+
+  const userId = req.body.userId;
+  console.log(userId);
+
+  try{
+    const user = await User.findByIdAndDelete({_id:userId});
+    console.log(user);
+    res.send("User was deleted");
+
+  }catch(err){
+
+    res.status(400).send("Error in the code");
+  }
+
+})
+
+// ============================================================>
+
+// ============================================================>
+
+  app.patch("/user/:userId", async(req,res)=>{
+
+    const userId = req.params.userId;
+    const data = req.body;
+
+    try{
+
+    // update validation - API validations
+    const Allowed_Updates = ["userId", "password","skills","about","photo"];
+
+    const isUpdatesAllowed = Object.keys(data).every((k)=> Allowed_Updates.includes(k));
+
+    if(!isUpdatesAllowed){
+
+      throw new Error("You can't update this field");
+    }
+
+    // data will be sent in body by a user
+     const beforeUpdateUser =  await User.findByIdAndUpdate({_id:userId}, data, {returnDocument:"before", runValidators:true});
+      res.send("User updated successfully");
+
+    } catch(err){
+
+      res.status(500).send(err.message);
+    }
+
+  })
+
 
 // ============================================================>
 

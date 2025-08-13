@@ -1,6 +1,5 @@
 const express = require ("express");
-
-const app = express ();
+const app = express();
 
 app.get("/user",(req,res,next)=>{
     console.log("First Handler");
