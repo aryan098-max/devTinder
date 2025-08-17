@@ -1,13 +1,13 @@
 const express = require ("express");
 const app = express ();
-const adminAuth = require("./middleware/auth");
-const User = require("./models/user");
-const connectDB = require("./config/database");
-const {validateSignUpData} = require("./utils/validation")
+const adminAuth = require("../middleware/auth");
+const User = require("../models/user");
+const connectDB = require("../config/database");
+const {validateSignUpData} = require("../utils/validation")
 const bcrypt = require("bcrypt");
 const cookiePraser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
-const {userAuth} = require("./middleware/auth")
+const {userAuth} = require("../middleware/auth")
 
 
 // this middleware will run on every request sent by the user

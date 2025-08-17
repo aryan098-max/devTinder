@@ -53,6 +53,10 @@ const userSchema = new Schema({
     },
     gender:{
         type:String,
+        enum:{
+            values:["male", "female", "other"],
+            message:`{VALUE} is not allowed`
+        },
         lowercase:true,
         // gender validātion
         validate(value){
@@ -99,12 +103,12 @@ userSchema.methods.getJWT = async function (){
 
 
 // custom method for validating password
-userSchema.methods.validatePassword = async function (InputPasswordByUser){
+userSchema.methods.validatePassword = async function (passwordInputByUser){
 
     const hashPassword = this.password;
 
     // this is pointing to current user
-    const isPasswordValid = await bcrypt.compare(InputPasswordByUser, hashPassword);
+    const isPasswordValid = await bcrypt.compare(passwordInputByUser, hashPassword);
     return isPasswordValid;
 
 }

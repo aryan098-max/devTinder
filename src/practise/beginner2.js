@@ -1,6 +1,6 @@
 const express = require ("express");
 const adminAuth = require("../middleware/auth");
-const User = require("./models/user");
+const User = require("../models/user");
 // this loc runs all the code inside the database.js
 const connectDB = require("../config/database");
 const app = express ();

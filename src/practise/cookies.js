@@ -1,21 +1,42 @@
 const express = require ("express");
-const adminAuth = require("../middleware/auth");
-const User = require("./models/user");
-// this loc runs all the code inside the database.js
-const connectDB = require("../config/database");
 const app = express ();
+const adminAuth = require("../middleware/auth");
+const User = require("../models/user");
+const connectDB = require("../config/database");
+const {validateSignUpData} = require("../utils/validation")
+const bcrypt = require("bcrypt");
+const cookiePraser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const {userAuth} = require("../middleware/auth")
+
 
 // this middleware will run on every request sent by the user
 //  it parses the req.body into an obj
 app.use(express.json());
+app.use(cookiePraser());
 
 // ============================================================>
 app.post("/signup", async (req,res)=>{
 
-  // making things dynamic
-    const userData = new User(req.body);
-  
+
   try{
+
+    // validating user data
+    validateSignUpData(req);
+
+    const {firstName, lastName, emailId, password} = req.body;
+
+    // Hasing password 
+    const hashPassword = await bcrypt.hash(password, 10);
+
+    // making things dynamic
+    const userData = new User({
+      firstName:firstName, 
+      lastName: lastName, 
+      emailId:emailId, 
+      password: hashPassword
+    });
+  
     await userData.save();
     res.send("User has been successfully added to the database");
 
@@ -27,6 +48,60 @@ app.post("/signup", async (req,res)=>{
 })
 // ============================================================>
 
+app.post("/login", async (req,res)=>{
+
+  try{
+
+    const {emailId, password} = req.body;
+
+    const user = await User.findOne({emailId:emailId}); 
+
+
+    if(!user){
+      throw new Error ("User doesn't exist in the Database");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if(isPasswordValid){
+
+      // creating a JSON WEB TOEKN
+       const token = jwt.sign({_id:user._id}, "Aryan@123")
+
+      // sending cookie
+      res.cookie("token", token);
+
+
+      res.send("Credentials Correct Login Successful");
+    } else {
+
+      throw new Error ("Password is not correct");
+    }
+
+
+  } catch (err){
+
+    res.status(500).send("Error " + err.message)
+  }
+
+})
+
+app.get("/profile", userAuth, async (req, res)=>{
+
+  try{
+
+      // user has been attached to req obj in userAtuh; therefore, extracting user from req
+      const user = req.user;
+
+      res.send(user);
+
+  } catch (err){
+
+    res.status(500).send("Error Occured " + err.message);
+
+  }
+
+})
 
 // ============================================================>
 app.get("/user", async (req,res)=>{
@@ -83,20 +158,30 @@ app.delete("/user", async (req,res)=>{
 
 // ============================================================>
 
-  app.patch("/user", async(req,res)=>{
+  app.patch("/user/:userId", async(req,res)=>{
 
-    const userId = req.body.userId;
+    const userId = req.params.userId;
     const data = req.body;
 
     try{
 
-      // data will be sent in body by a user
+    // update validation - API validations
+    const Allowed_Updates = ["userId", "password","skills","about","photo"];
+
+    const isUpdatesAllowed = Object.keys(data).every((k)=> Allowed_Updates.includes(k));
+
+    if(!isUpdatesAllowed){
+
+      throw new Error("You can't update this field");
+    }
+
+    // data will be sent in body by a user
      const beforeUpdateUser =  await User.findByIdAndUpdate({_id:userId}, data, {returnDocument:"before", runValidators:true});
-     console.log(beforeUpdateUser);
       res.send("User updated successfully");
+
     } catch(err){
 
-      res.status(404).send(err.message);
+      res.status(500).send(err.message);
     }
 
   })

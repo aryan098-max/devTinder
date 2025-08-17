@@ -1,122 +1,27 @@
 const express = require ("express");
 const app = express ();
-const adminAuth = require("./middleware/auth");
 const User = require("./models/user");
 const connectDB = require("./config/database");
-const {validateSignUpData} = require("./utils/validation")
-const bcrypt = require("bcrypt");
 const cookiePraser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
 const {userAuth} = require("./middleware/auth")
 
-
-// this middleware will run on every request sent by the user
-//  it parses the req.body into an obj
+// middlewares run on every request to the server
 app.use(express.json());
 app.use(cookiePraser());
 
-// ============================================================>
+// Importing all the routes
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/request");
 
-app.post("/signup", async (req,res)=>{
-
-
-  try{
-
-    // validating user data
-    validateSignUpData(req);
-
-    const {firstName, lastName, emailId, password} = req.body;
-
-    // Hasing password 
-    const hashPassword = await bcrypt.hash(password, 10);
-
-    // making things dynamic
-    const userData = new User({
-      firstName:firstName, 
-      lastName: lastName, 
-      emailId:emailId, 
-      password: hashPassword
-    });
-  
-    await userData.save();
-    res.send("User has been successfully added to the database");
-
-  } catch(err){
-
-    res.status(500).send(err.message);
-  }
-
-})
-// ============================================================>
-
-app.post("/login", async (req,res)=>{
-
-  try{
-
-    const {emailId, password} = req.body;
-    const user = await User.findOne({emailId:emailId}); 
-
-    if(!user){
-      throw new Error ("User doesn't exist in the Database");
-    }
-
-    // const isPasswordValid = await bcrypt.compare(password, user.password);
-    const isPasswordValid = await user.validatePassword(password);
-
-    if(isPasswordValid){
-
-      // creating a JSON WEB TOEKN
-      //  const token = jwt.sign({_id:user._id}, "Aryan@123", {expiresIn:"1d"})
-      //  console.log(token);
-
-      const token = await user.getJWT();
-
-
-      // sending cookie
-      res.cookie("token", token, {expires:new Date(Date.now() + 24 * 60* 60 * 1000)});
-
-      res.send("Credentials Correct Login Successful");
-    } else {
-
-      throw new Error ("Password is not correct");
-    }
-
-  } catch (err){
-
-    res.status(500).send("Error " + err.message)
-  }
-})
-
-// ============================================================>
-
-app.get("/profile", userAuth, async (req, res)=>{
-
-  try{
-
-      // user has been attached to req obj in userAtuh; therefore, extracting user from req
-      const user = req.user;
-
-      res.send(user);
-
-  } catch (err){
-
-    res.status(500).send("Error Occured " + err.message);
-
-  }
-
-})
-
-// ============================================================>
-
-app.post("/connectionRequest", userAuth, async (req, res)=>{
-
-  const user = req.user;
-
-  res.send(user.firstName + " sent the connection request");
-
-})
-
-// ============================================================>
+/** 
+  1. using all the routes, routes are acting like middlewares now
+  2. Whenever a user sends a request it goes through all the routes one by one 
+     and when a matching route is found response is sent by the server
+*/
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
 
 
 connectDB()
