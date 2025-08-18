@@ -5,73 +5,99 @@ const ConnectionRequest = require("../models/connectionRequest");
 const User = require("../models/user");
 const mongoose = require("mongoose")
 
-requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)=>{
 
-  // currently loggedIn user = fromUserId because it sends a request to other user - toUserId 
-  // toUserId will get a request from the currently loggedInUser - Think this analogy as Facebook
+requestRouter.post("/request/send/:status/:toUserId", userAuth, async(req,res)=>{
 
   try{
 
-    const fromUserId = req.user._id;
-    const toUserId = req.params.toUserId;
-    const status = req.params.status;
+    // fetching user 
+    const loggedInUser = req.user;
+    const fromUserId = loggedInUser._id
+    const {status} = req.params;
+    const {toUserId} = req.params;
 
-    // statusvalidations
-    const allowedStatusType = ["interested", "ignored"];  
-    if(!allowedStatusType.includes(status)){
+    // status validation
+    const Allowed_Status = ["interested", "ignored"];
 
-        return res.status(400).json({message:"Not allowed Status Type: " + status });s
+    if(!Allowed_Status.includes(status)){
+      return res.status(400).send("Status Not Valid");
     }
 
-    // userId valid or not 
-    if (!mongoose.Types.ObjectId.isValid(toUserId)) {
-      return res.status(400).json({ message: "Invalid user ID" });
+    // toUserId Validation
+    if(!mongoose.Types.ObjectId.isValid(toUserId)){
+      return res.status(400).send("UserId Not Valid");
     }
 
-    // userID exists or not checking in users collections
-    const toUser = await User.findById(toUserId);
-    if(!toUser){
-        return res.status(404).json({message:"This user doesn't exist"});
-    }
-
-    // sending connection to yourself
-    // if(fromUserId.toString() === toUserId.toString()){
-    //   return res.status(400).send("You can't send request to yourself");
-    // }
-
-    // existing connection validation, checking A->B or B->A 
-    // Not chaning the schema just exchanging the values
-
+    // existing connection validation
     const existingConnectionRequest = await ConnectionRequest.findOne({
-      $or:[
-        {fromUserId:fromUserId, toUserId:toUserId},
-        {fromUserId:toUserId, toUserId:fromUserId} // what is this second condition checking
-      ]
+       $or:[{fromUserId: fromUserId, toUserId: toUserId}, {fromUserId:toUserId, toUserId:fromUserId}] , 
     })
 
     if(existingConnectionRequest){
-      return res.status(400).send("Connection Request already exists");
+      return res.status(400).send("A connection request already exists")
     }
 
+    // creating a new connectionRequest document 
     const connectionRequest = new ConnectionRequest({
+      fromUserId:fromUserId,
+      toUserId:toUserId,
+      status:status
+    })
 
-      fromUserId:fromUserId, 
-      toUserId: toUserId, 
-      status: status
-      
-    });
+    // saving the new connection 
+    await connectionRequest.save();
 
-    // saving connection in the database 
+    res.json({message:"A conneciton request was sent"});
 
-    const data = await connectionRequest.save();
-
-    res.json({message:"Connection Request Sent Successfully", data:data})
 
   } catch (err){
 
-    res.status(400).send("Error: " + err.message);
+      res.status(400).send("Error Occured: "+ err.message);
+  }
+})
+
+
+
+requestRouter.post("/request/review/:status/:requestId", userAuth, async(req,res)=>{
+
+  try{  
+
+    const loggedInUser = req.user;
+    const {status} = req.params;
+    const {requestId} = req.params;
+
+    // status validation 
+    const Allowed_Status = ["accepted", "rejected"];
+
+    if(!Allowed_Status.includes(status)){
+      return res.status(400).send("Status Not Valid");
+    }
+
+    // requestId Validation 
+
+    if(!mongoose.Types.ObjectId.isValid(requestId)){
+      return res.status(400).send("RequestId Not Valid");
+    }
+
+    // searching for connection request
+    const connectionRequest = await ConnectionRequest.findOne({
+      toUserId:loggedInUser._id, 
+      status:"interested"
+    })
+
+    // changing status
+    connectionRequest.status = status;
+
+    const data = await connectionRequest.save();
+
+    res.json({message:"Connection Request was: " + status, data:connectionRequest});
+
+  } catch (err){
+
 
   }
 })
+
+// I need to accept a user's request
 
 module.exports = requestRouter;

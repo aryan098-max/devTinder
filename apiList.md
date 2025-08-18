@@ -27,6 +27,6 @@
 - PATCH /request/send/:status/
 
 ## userRouter
+- GET /user/requests/received (Pending Requests received by the LoogedInuser)
 - GET /user/connections (matches, can send messages to these users)
-- GET /user/requests (Requests received by the user)
 - GET /user/feed (list of 20-30 random users)

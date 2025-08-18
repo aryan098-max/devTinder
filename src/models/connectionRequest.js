@@ -6,11 +6,13 @@ const connectionRequestSchema = new Schema({
 
     fromUserId:{
         type: mongoose.Schema.Types.ObjectId, 
+        ref:"User", // reference to the User collection
         required:true
     }, 
 
     toUserId:{
         type:mongoose.Schema.Types.ObjectId, 
+        ref:"User",
         required:true
     },
 
@@ -39,6 +41,8 @@ connectionRequestSchema.pre("save", function (next){
     }
     next(); 
 })
+
+
 
 // compund indexing, compund queries will be very fast
 connectionRequestSchema.index({fromUserId:1, toUserId:1}, { unique: true });
