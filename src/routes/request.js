@@ -47,7 +47,11 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async(req,res)=>
     // saving the new connection 
     await connectionRequest.save();
 
-    res.json({message:"A conneciton request was sent"});
+    // fetch toUserId firstName 
+    const toUser = await User.findById(toUserId).select("firstName lastName");
+    console.log(toUser);
+
+    res.json({message:`${loggedInUser.firstName} has sent a connection request to ${toUser.firstName}` });
 
 
   } catch (err){
@@ -55,7 +59,6 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async(req,res)=>
       res.status(400).send("Error Occured: "+ err.message);
   }
 })
-
 
 
 requestRouter.post("/request/review/:status/:requestId", userAuth, async(req,res)=>{
