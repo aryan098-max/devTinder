@@ -30,12 +30,10 @@ const userLoginData = joi.object({
 const validateUserData = (userData)=>{
 
     const {error} = userLoginData.validate(userData);
-
     if(error){
         const errorMessages= error.details.map((err)=>err.message)
         return {isValid:false, errorMessages};
     }
-
     return {isValid:true};
 }
 

@@ -34,7 +34,6 @@ const userSchema = new Schema({
             validator:function(value){
                 return validator.isStrongPassword(value);
             },
-
             message:"Password Not Strong Enough"
         },
         required:true
@@ -61,7 +60,13 @@ const userSchema = new Schema({
         default:"CS student chasing dreams"
     }, 
     skills:{
-        type:[String]
+        type:[String],
+        validate:{
+            validator:function (arr){
+                return arr.length >=1 && arr.length <=5; // min=1, max=5
+            },
+            message:"Limit is 5 Skills"
+        }
     }
 
 

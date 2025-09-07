@@ -48,6 +48,7 @@
 # Update Validation 
 - If a user tries to update email prevent it using const ALLOWED_UPDATES = ["fields you want to update only"]
 - For checking userId - mongoose.Types.ObjectId.isValid(userId)
+- Use validate for putting restriction in skills count
 
 # Note: 
 1. joi api level validation creates problem in updating. DON'T USE FOR UPDATES

@@ -82,10 +82,9 @@ app.patch("/user/:id", async(req, res)=>{
     try{
         const userData = req.body;
         const {id}= req.params;
-        const userId = id.toString();
 
         // validating userId
-        if(!mongoose.Types.ObjectId.isValid(userId)){
+        if(!mongoose.Types.ObjectId.isValid(id)){
               return res.status(400).send("Invalid User ID");
         }
 
@@ -101,14 +100,18 @@ app.patch("/user/:id", async(req, res)=>{
         }
 
         // finding User and Update
-        const user = User.findByIdAndUpdate({_id:userId}, userData, {runValidators:true});
+        const user = await User.findByIdAndUpdate({_id:id}, userData, {runValidators:true});
+
+        // User Doesn't Exists
+        if(!user){
+            return res.json(404).json({message:"User Not Found"});
+        }
 
         res.json({message:"User updated Successfully"});
 
     } catch (err){
 
         res.status(400).send("Error Occured" + err.message);
-
     }
 })
 
