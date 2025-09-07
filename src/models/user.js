@@ -1,17 +1,18 @@
 const mongoose = require('mongoose');
-const {Schema} = new mongoose;
+const validator = require('validator');
+const {Schema} = mongoose;
 
 const userSchema = new Schema({
 
     firstName:{
         type:String,
-        minLengh:3,
-        maxLength:10
+        minlengh:3,
+        maxlength:10
     }, 
     lastName:{
         type:String,
-         minLengh:3,
-        maxLength:10
+        minlengh:3,
+        maxlength:10
     },
     emailId:{
         type:String,
@@ -35,7 +36,8 @@ const userSchema = new Schema({
             },
 
             message:"Password Not Strong Enough"
-        }
+        },
+        required:true
     },
     age:{
         type:Number, 
@@ -54,7 +56,7 @@ const userSchema = new Schema({
             }
         }
     }, 
-    About:{
+    about:{
         type:String,
         default:"CS student chasing dreams"
     }, 
@@ -63,8 +65,8 @@ const userSchema = new Schema({
     }
 
 
-},{timeStamps:true});
+},{timestamps:true});
 
-const User = new mongoose.model("user",userSchema);
+const User = mongoose.model("user",userSchema);
 
 module.exports = User;

@@ -1,3 +1,14 @@
+- List of Dependencies
+1. node.js
+2. express.js
+3. mongodb
+4. mongoose
+5. validator
+6. nodemon - for script
+7. bcrypt - hashing password
+8. joi - api level validation
+9. 
+
 - List of all the apis
 
     # auth 
@@ -33,4 +44,13 @@
   }
 
   - findByIdAndUpdate({_id:userId},req.body,{runValidators:true}), must do it on patch 
-  
+
+# Update Validation 
+- If a user tries to update email prevent it using const ALLOWED_UPDATES = ["fields you want to update only"]
+- For checking userId - mongoose.Types.ObjectId.isValid(userId)
+
+# Note: 
+1. joi api level validation creates problem in updating. DON'T USE FOR UPDATES
+
+# Delete Route
+- use findByIdAndDelete(userId), Always Convert userId into userId.toString()
