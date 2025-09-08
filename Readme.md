@@ -7,7 +7,8 @@
 6. nodemon - for script
 7. bcrypt - hashing password
 8. joi - api level validation
-9. 
+9. jsonwebtoken (json web token)
+10. cookie-parser (middleware for parsing cookie sent by the browser)
 
 - List of all the apis
 
@@ -60,3 +61,10 @@
 # Envrypting Password using Bcrypt
 1. While saving {password:hashedPassword}
 2. await bcrypt.compare(userPassword, hashedPassword), Don't forget to add await
+
+# JWT (Json Web Token) && Cookie - INSTALL jsonwebtoken && cookie-parser, require both cookie-praser and jwt
+- Imp: cookie-parser is a middleware - used for parsing cookies, 
+- const cookieParser = require('cookie-parser'), app.use(cookieParser())
+- After succesfull login, create jwt token and wrap it inside cookie and send to the browser
+- Every time a user sends a api request jwt token is verified
+- This is the reason that a user can stay loggedIn in a website for weeks

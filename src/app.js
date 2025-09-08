@@ -3,6 +3,8 @@ const app = express();
 const dbConnection = require("./config/database");
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
 // Importing models
 const Admin = require("./models/admin");
@@ -16,6 +18,8 @@ const {validateAdminData, validateSignupData, validateLoginData} = require("./ut
 
 // middlewares
 app.use(express.json());
+app.use(cookieParser());
+
 
 app.post("/admin/auth/login", adminAuth, (req, res)=>{
 
@@ -114,15 +118,51 @@ app.post("/login", async(req,res)=>{
         // Comparing password 
         const isPasswordMatching = await bcrypt.compare(password, user.password);
 
-        if(!isPasswordMatching){
+        if(isPasswordMatching){
+
+            // creating token
+            const token = await jwt.sign({_id:user._id}, "Ary@nSomen123", {expiresIn:"1d"})
+
+            // After successful login - Create JWT token
+            res.cookie("token", token);
+
+          res.send("User loggedIn Successfully");
+        } else {
             return res.status(400).json({message:"Wrong Credentials"});
         }
         
-        res.send("User loggedIn Successfully");
-
     } catch (err){
 
         res.status(400).send("Error Ocurred" + err.message)
+    }
+})
+
+app.get("/user/profile", async(req,res)=>{
+
+    try{
+
+        // Get the cookies
+        const cookie = req.cookies;
+        const {token} = cookie;
+
+        // validate token
+            const decodedMessage = await jwt.verify(token, "Ary@nSomen123");
+            const {_id} = decodedMessage;
+
+        // finding user based on userId
+        const user = await User.findById(_id);
+        console.log(user);
+
+        if(!user){
+            return res.status(404).json({message:"User Not Found"});
+        }
+
+        res.send(user.firstName);
+
+    } catch (err){
+
+        res.status(400).send("Error Occured: " + err.message); 
+
     }
 })
 
