@@ -68,3 +68,11 @@
 - After succesfull login, create jwt token and wrap it inside cookie and send to the browser
 - Every time a user sends a api request jwt token is verified
 - This is the reason that a user can stay loggedIn in a website for weeks
+
+- Difference between expiresIn (token) and expire in cookie
+👉 JWT expiry = security check on the server
+👉 Cookie expiry = storage lifetime in the client (browser)
+
+Note:
+- Token creation is done using user schema methods
+- Token validation is done inside userAuth

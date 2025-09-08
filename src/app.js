@@ -11,7 +11,8 @@ const Admin = require("./models/admin");
 const User = require("./models/user");
 
 // importing adminAuth middleware
-const adminAuth = require("./middlewares/adminAuth")
+const adminAuth = require("./middlewares/adminAuth");
+const userAuth = require("./middlewares/auth");
 
 // validation
 const {validateAdminData, validateSignupData, validateLoginData} = require("./utils/validation");
@@ -116,15 +117,15 @@ app.post("/login", async(req,res)=>{
         }
 
         // Comparing password 
-        const isPasswordMatching = await bcrypt.compare(password, user.password);
+        const isPasswordMatching = await user.validatePassword(password);
 
         if(isPasswordMatching){
 
             // creating token
-            const token = await jwt.sign({_id:user._id}, "Ary@nSomen123", {expiresIn:"1d"})
+            const token = await user.getJWT();
 
             // After successful login - Create JWT token
-            res.cookie("token", token);
+            res.cookie("token", token, {expires:new Date(Date.now() +  60 * 60 * 24* 1000)});
 
           res.send("User loggedIn Successfully");
         } else {
@@ -137,32 +138,15 @@ app.post("/login", async(req,res)=>{
     }
 })
 
-app.get("/user/profile", async(req,res)=>{
+app.get("/user/profile", userAuth, async(req,res)=>{
 
     try{
-
-        // Get the cookies
-        const cookie = req.cookies;
-        const {token} = cookie;
-
-        // validate token
-            const decodedMessage = await jwt.verify(token, "Ary@nSomen123");
-            const {_id} = decodedMessage;
-
-        // finding user based on userId
-        const user = await User.findById(_id);
-        console.log(user);
-
-        if(!user){
-            return res.status(404).json({message:"User Not Found"});
-        }
-
-        res.send(user.firstName);
+        const user = req.user;
+        res.send(user);
 
     } catch (err){
 
         res.status(400).send("Error Occured: " + err.message); 
-
     }
 })
 
@@ -223,7 +207,6 @@ app.delete("/user/:id",async (req,res)=>{
     } catch (err){
 
         res.status(400).send("Error Occured" + err.message);
-
     }
 })
 
