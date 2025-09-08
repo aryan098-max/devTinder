@@ -12,7 +12,7 @@ const User = require("./models/user");
 const adminAuth = require("./middlewares/adminAuth")
 
 // validation
-const {validateAdminData, validateUserData} = require("./valdiation/validation");
+const {validateAdminData, validateSignupData, validateLoginData} = require("./utils/validation");
 
 // middlewares
 app.use(express.json());
@@ -54,17 +54,32 @@ app.post("/signup", async(req,res)=>{
 
     try{
         // extracting userData from req.body
-        const userData = req.body;
+        const {firstName, lastName, emailId, password, skills, age, gender, about, photoURL} = req.body;
+        console.log(skills, age, gender, about, photoURL);
 
         // api data validation
-        const {isValid, errorMessages} = validateUserData(userData);
+        const {isValid, errorMessages} = validateSignupData(req.body);
 
         if(!isValid){
             return res.status(400).send(errorMessages);
         }
+
+        // Encrypt the password
+        const hashedPassword = await bcrypt.hash(password, 10)
+
         
         // creating a new user
-        const user = new User(userData)
+        const user = new User({
+            firstName, 
+            lastName, 
+            emailId,
+            password:hashedPassword, 
+            skills, 
+            age, 
+            gender, 
+            about, 
+            photoURL
+        })
 
         // saving in the database returns a promise
         await user.save();
@@ -74,6 +89,40 @@ app.post("/signup", async(req,res)=>{
     } catch (err){
 
         res.status(400).send("Error Occurred" + err.message);
+    }
+})
+
+app.post("/login", async(req,res)=>{
+
+    try{
+        const {emailId, password} = req.body;
+
+        // api level validation using joi 
+        const {isValid, errorMessages} = validateLoginData(req.body);
+
+        if(!isValid){
+            return res.status(400).json({message:errorMessages});
+        }
+
+        // User Exist Or Not
+        const user = await User.findOne({emailId});
+
+        if(!user){
+            return res.status(404).json({message:"User Not Found"});
+        }
+
+        // Comparing password 
+        const isPasswordMatching = await bcrypt.compare(password, user.password);
+
+        if(!isPasswordMatching){
+            return res.status(400).json({message:"Wrong Credentials"});
+        }
+        
+        res.send("User loggedIn Successfully");
+
+    } catch (err){
+
+        res.status(400).send("Error Ocurred" + err.message)
     }
 })
 
@@ -88,7 +137,7 @@ app.patch("/user/:id", async(req, res)=>{
               return res.status(400).send("Invalid User ID");
         }
 
-        // Not Allowing Email update
+        // Not Allowing Email update, Api Level Validation
         const ALLOWED_UPDATES = ["age", "gender", "about", "skills"];
 
         const isUpdateAllowed = Object.keys(userData).every(

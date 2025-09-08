@@ -55,6 +55,18 @@ const userSchema = new Schema({
             }
         }
     }, 
+
+    photoURL:{
+        type:String, 
+        default:"https://cdn.vectorstock.com/i/1000v/92/16/default-profile-picture-avatar-user-icon-vector-46389216.jpg",
+        validate:{
+            validator:function (phtourl){
+                return validator.isURL(phtourl);
+            },
+            message:"The Photo URL Is Not Correct"
+        }
+
+    },
     about:{
         type:String,
         default:"CS student chasing dreams"
