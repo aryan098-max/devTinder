@@ -42,10 +42,11 @@
         }, 
         message:"Email Id is not Valid"
   }
+  - Similarly, you can validation on photoURL and a lot of things
 
   - findByIdAndUpdate({_id:userId},req.body,{runValidators:true}), must do it on patch 
 
-# Update Validation 
+# Update_Method Validation 
 - If a user tries to update email prevent it using const ALLOWED_UPDATES = ["fields you want to update only"]
 - For checking userId - mongoose.Types.ObjectId.isValid(userId)
 - Use validate for putting restriction in skills count
@@ -55,3 +56,7 @@
 
 # Delete Route
 - use findByIdAndDelete(userId), Always Convert userId into userId.toString()
+
+# Envrypting Password using Bcrypt
+1. While saving {password:hashedPassword}
+2. await bcrypt.compare(userPassword, hashedPassword), Don't forget to add await
