@@ -12,13 +12,32 @@
 
 - List of all the apis
 
-    # auth 
+    1. auth - authRouter
+    - POST /signup
+    - POST /login
+    - POST /logout
 
-    # userprofile
+    2. userprofile - profileRouter
+    - GET   /profile/view
+    - PATCH /profile/edit/:id
+    - DELETE /profile/:id
+    - PATCH /profile/password
+    
+    3. connections - connectionRequestRouter
+    - Total 4 status - interested, ignored, - interested - accepted or rejected
+    Note: Creating dynamic routes for interested or ignored, Same for accepted or rejected
+        
+    - /request/send/interested/:userId, /request/send/ignored/:userId 
+    = POST /request/send/:status/:userId
 
-    # connections
+    - /request/review/accepted/:requestId, /request/review/rejected/:requestId
+     = POST /request/review/:status/:requestId
 
-    # feed
+    4. feed - userRouter
+    - GET /user/connections
+    - GET /user/requests/received
+    - GET /user/feed - Gets you the profile of other users on platform
+
 
 - Create a src folder 
     - create config, middleware, app.js folders and file
@@ -76,3 +95,7 @@
 Note:
 - Token creation is done using user schema methods
 - Token validation is done inside userAuth
+
+# Creating Separate Routes and Using Express Router
+- For each group of secific api - using same routes
+- 
