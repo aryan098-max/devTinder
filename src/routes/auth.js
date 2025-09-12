@@ -8,10 +8,10 @@ const User = require("../models/user");
 // Imorting middlewares
 const userAuthentication = require('../middlewares/userAuth');
 
-// importing 
+// importing validation
 const {validateSignupData, validateLoginData} = require("../utils/validation");
 
-
+// Defining routes
 authRouter.post("/signup", async(req,res)=>{
 
     try{

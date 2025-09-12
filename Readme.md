@@ -98,4 +98,17 @@ Note:
 
 # Creating Separate Routes and Using Express Router
 - For each group of secific api - using same routes
-- 
+- Add edit/profile/password - routes own your own
+- Completed Auth & Profile Routes
+
+# Creating connection request schema && defining routes
+- Creating Connection Request schema
+- Defining - /request/send/:status/:toUserId
+- Add all the validations (cover all the corner cases)
+- Use of complex queries: $or[{},{}]
+
+# Indexing in the schema
+- Indexing makes find/search operations faster, queries would be faster
+- Note: unique:true, automatically creates index
+- Complex queries make operations slow; therefore, use compound index. Created inside schema
+- conectionRequsetSchema({fromUserId:1, toUserId:1})

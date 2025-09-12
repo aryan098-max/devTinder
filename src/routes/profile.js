@@ -12,6 +12,7 @@ const userAuthentication = require("../middlewares/userAuth");
 // importing validation
 const {validateProfileData} = require("../utils/validation");
 
+// Defining routes
 profileRouter.get("/profile/view", userAuthentication, async(req,res)=>{
 
     try{

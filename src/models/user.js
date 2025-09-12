@@ -52,6 +52,7 @@ const userSchema = new Schema({
             values:["male", "female", "others"],
             message:"{VALUE} is not a valid gender"
         },
+        // redundant - enum already checking
         validate(value){
             if(!(["male","female","others"].includes(value))){
                 throw new Error ("Not a Valid Gender");
@@ -106,6 +107,6 @@ userSchema.methods.getJWT = function (){
     return token;
 }
 
-const User = mongoose.model("user",userSchema);
+const User = mongoose.model("user",userSchema); // is new mandate
 
 module.exports = User;
