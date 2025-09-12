@@ -32,6 +32,7 @@ const userSchema = new Schema({
     },
     password:{
         type:String,
+        minlength:8, 
         validate:{
             validator:function(value){
                 return validator.isStrongPassword(value);

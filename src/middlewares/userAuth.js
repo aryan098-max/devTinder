@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const userAuth = async (req, res, next)=>{
+const userAuthentication = async (req, res, next)=>{
 
     try{
     // Getting cookes
@@ -36,4 +36,4 @@ const userAuth = async (req, res, next)=>{
     }
 }
 
-module.exports = userAuth;
+module.exports = userAuthentication;
