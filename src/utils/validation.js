@@ -4,7 +4,7 @@ const userSignupData = joi.object({
     firstName:joi.string().min(3).max(8).required(),
     lastName:joi.string().min(3).max(8).required(),
     emailId:joi.string().email().trim().required(),
-    password:joi.string().min(8).max(15).required(),
+    password:joi.string().min(8).required(),
     gender:joi.string().valid("male","female","others"),
     age:joi.number(),
     photoURL:joi.string(),

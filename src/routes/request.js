@@ -75,7 +75,62 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async(req,res)=>
         res.json({message:loggedInUser.firstName + " is " + status + " on " + toUser.firstName, data});
 
     } catch (err){
+
+        res.status(400).send("Error Occured: " + err.message);
+    }
+})
+
+requestRouter.post("/request/review/:status/:requestId", userAuth, async(req,res)=>{
+    try{
+        // accessing user data
+        const loggedInUser = req.user;
+        const {status, requestId} = req.params
         
+        // status validation = interested && allowed status
+        const Allowed_Status = ["accepted","rejected"];
+        const isStatusAllowed = Allowed_Status.includes(status);
+
+        if(!isStatusAllowed){
+            return res.status(400).json({message:"Not Allowed Status Type"})
+        }
+
+        // valid requestId = ObjectId
+        if(!mongoose.Types.ObjectId.isValid(requestId)){
+            return res.status(400).json({message:"Request Id is not a valid Id"});
+        }
+
+
+        // ================= All three Validtions Using findOne ================>
+        // requestId exists or not
+        const connectionRequest = await ConnectionRequest.findOne({
+            _id:requestId,
+            toUserId:loggedInUser._id,
+            status:"interested"
+        })
+
+        if(!connectionRequest){
+            return res.status(404).json({message:"Connection request not found"});
+        }
+
+        // checking loggedInUser is toUserId && requestId.status == interested
+        // if(!loggedInUser._id.equals(connectionRequest.toUserId)){
+        //     return res.status(403).json({message:"You are not allowed to review this request"});
+        // }
+
+        // if(connectionRequest.status !== "interested"){
+        //     return res.status(400).json({message:`{ The request has already been ${connectionRequest.status}`});
+        // }
+
+        // ====================================================================>
+
+        // connection request exist
+        connectionRequest.status = status;
+        const data = await connectionRequest.save();
+
+        res.json({message:`${loggedInUser.firstName} has ${status} the request`, data});
+
+    } catch (err){
+
         res.status(400).send("Error Occured: " + err.message);
     }
 })
