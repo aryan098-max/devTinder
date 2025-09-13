@@ -107,6 +107,6 @@ userSchema.methods.getJWT = function (){
     return token;
 }
 
-const User = mongoose.model("user",userSchema); // is new mandate
+const User = mongoose.model("user",userSchema);
 
 module.exports = User;

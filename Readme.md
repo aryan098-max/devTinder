@@ -101,7 +101,7 @@ Note:
 - Add edit/profile/password - routes own your own
 - Completed Auth & Profile Routes
 
-# Creating connection request schema && defining routes
+# Creating connection request schema && defining send request api
 - Creating Connection Request schema
 - Defining - /request/send/:status/:toUserId
 - Add all the validations (cover all the corner cases)
@@ -111,4 +111,8 @@ Note:
 - Indexing makes find/search operations faster, queries would be faster
 - Note: unique:true, automatically creates index
 - Complex queries make operations slow; therefore, use compound index. Created inside schema
-- conectionRequsetSchema({fromUserId:1, toUserId:1})
+- conectionRequsetSchema.index({fromUserId:1, toUserId:1})
+
+# Creating review request api
+- Defining review request api - /request/review/:status/:requestId
+- Convered all the corner cases 
