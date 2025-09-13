@@ -34,8 +34,8 @@
      = POST /request/review/:status/:requestId
 
     4. feed - userRouter
+    - GET /user/requests/received - more clear
     - GET /user/connections
-    - GET /user/requests/received
     - GET /user/feed - Gets you the profile of other users on platform
 
 
@@ -116,3 +116,9 @@ Note:
 # Creating review request api
 - Defining review request api - /request/review/:status/:requestId
 - Convered all the corner cases 
+
+# Creaing and Defining userRouter & Creating relation between two collections using ref field
+- Defning userRouter, 1. /user/requests/received
+- Populating api - using ref (establishing relationship between user & connectionRequest collection)
+- toUserId & fromUserId - replaced with user data - because of ref = estalished connection
+
