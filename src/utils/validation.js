@@ -1,10 +1,20 @@
 const joi = require("joi");
+const PasswordComplexity = require('joi-password-complexity');
+
+const complexityOptions ={
+  min: 8,
+  max:30,
+  lowerCase: 1,
+  upperCase: 1,
+  numeric: 1,
+  symbol: 1,
+}
 
 const userSignupData = joi.object({
     firstName:joi.string().min(3).max(8).required(),
-    lastName:joi.string().min(3).max(8).required(),
+    lastName:joi.string().min(3).max(15).required(),
     emailId:joi.string().email().trim().required(),
-    password:joi.string().min(8).required(),
+    password:PasswordComplexity(complexityOptions).required(),
     gender:joi.string().valid("male","female","others"),
     age:joi.number(),
     photoURL:joi.string(),
@@ -58,5 +68,20 @@ const validateProfileData = (userData)=>{
     return {isValid:true};
 }
 
-module.exports = {validateSignupData, validateLoginData, validateProfileData};
+const userPasswordData = joi.object({
+    password:PasswordComplexity(complexityOptions).required()
+})
+
+const validatePassword = (userData) =>{
+
+    const {error} = userPasswordData.validate(userData);
+    
+    if(error){
+        const errorMessages = error.details.map((err)=>err.message);
+        return {isValid:false, errorMessages};
+    }
+    return {isValid:true};
+}
+
+module.exports = {validateSignupData, validateLoginData, validateProfileData, validatePassword};
 
