@@ -10,7 +10,7 @@ const User = require("../models/user");
 const userAuthentication = require("../middlewares/userAuth");
 
 // importing validation
-const {validateProfileData} = require("../utils/validation");
+const {validateProfileData, validatePassword} = require("../utils/validation");
 
 // Defining routes
 profileRouter.get("/profile/view", userAuthentication, async(req,res)=>{
@@ -68,10 +68,17 @@ profileRouter.patch("/profile/edit", userAuthentication, async(req, res)=>{
 profileRouter.patch("/profile/edit/password", userAuthentication, async(req, res)=>{
 
     try{
-
         // accessing user data and loggedInUser
         const userData = req.body;
         const loggedInUser = req.user;
+
+        // validating password
+        const {isValid, errorMessages} = validatePassword(userData);
+        console.log(isValid, errorMessages);
+
+        if(!isValid){
+            return res.status(400).json({message:errorMessages});
+        }
 
         // comparing password
         const isPasswordMatching = await loggedInUser.validatePassword(userData.password)
@@ -91,6 +98,7 @@ profileRouter.patch("/profile/edit/password", userAuthentication, async(req, res
         const newHashedPassword = await bcrypt.hash(userData.password, 10);
 
         // assigning  a new hashed password & saving the database
+        // const user = await User.findByIdAndUpdate({_id:loggedInUser._id},{password:newHashedPassword},{runValidators:true})
         loggedInUser.password = newHashedPassword;
         await loggedInUser.save();
 
@@ -100,7 +108,6 @@ profileRouter.patch("/profile/edit/password", userAuthentication, async(req, res
 
         res.status(500).send("Error Occured: " + err.message);
     }
-
 })
 
 profileRouter.delete("/profile/delete",userAuthentication, async (req,res)=>{

@@ -28,7 +28,7 @@ const userSchema = new Schema({
                return validator.isEmail(value) && value.endsWith(".com")
             }, 
             message:"Email Id is Not Valid"
-        }
+        },
     },
     password:{
         type:String,
@@ -37,7 +37,7 @@ const userSchema = new Schema({
             validator:function(value){
                 return validator.isStrongPassword(value);
             },
-            message:"Password Not Strong Enough"
+            message:"Enter a stronger password"
         },
         required:true
     },

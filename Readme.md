@@ -9,6 +9,7 @@
 8. joi - api level validation
 9. jsonwebtoken (json web token)
 10. cookie-parser (middleware for parsing cookie sent by the browser)
+11. joi-password-complexity
 
 - List of all the apis
 
@@ -121,4 +122,9 @@ Note:
 - Defning userRouter, 1. /user/requests/received
 - Populating api - using ref (establishing relationship between user & connectionRequest collection)
 - toUserId & fromUserId - replaced with user data - because of ref = estalished connection
+
+# Install joi-password-complexity
+- npm install joi-password-complexity
+- As validate function was not working because of hashing; therefore, using joi-password-complexity
+- Note: schema validation works before the data is being saved.
 
