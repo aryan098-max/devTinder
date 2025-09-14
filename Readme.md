@@ -128,3 +128,21 @@ Note:
 - As validate function was not working because of hashing; therefore, using joi-password-complexity
 - Note: schema validation works before the data is being saved.
 
+# Create user connection api 
+- /user/connections - give all the "accepted connections'
+- Make sure that connection fromUserId toUserId both are visible, A->B, C-A, D->A
+
+# Feed Api, Use of complex queries $and, $or, $nin, $ne && Pagination 
+- Defining user's feed api - /feed
+- Use complex queries - for easy manipulation of Database collection
+- Use of select for selecting specific field - .select("fromUserId toUserId");
+- .select(" ") takes only one argument; therefore, separate users with space
+
+# Pagination 
+- /feed?page=1&limit=10 => first 10 users 1-10 = .skip(0).limit(10)
+- /feed?page=2$limit=20 => 11-20 = .skip(10).limit(10)
+- function for pagination - for skipping  & limiting users - .skip() & .limit()
+- skip() - how many users you want to skip from the start
+- For example, skip(0).limit(10) - skip 0 users and give me 10 users
+- skip formula = (page-1)*10;
+- .skip(skip).limit(limit) = chained on the search results, find(), findById()
