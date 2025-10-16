@@ -11,7 +11,7 @@ const complexityOptions ={
 }
 
 const userSignupData = joi.object({
-    firstName:joi.string().min(3).max(8).required(),
+    firstName:joi.string().min(3).max(10).required(),
     lastName:joi.string().min(3).max(15).required(),
     emailId:joi.string().email().trim().required(),
     password:PasswordComplexity(complexityOptions).required(),
