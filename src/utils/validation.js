@@ -19,7 +19,7 @@ const userSignupData = joi.object({
     age:joi.number(),
     photoURL:joi.string(),
     about:joi.string(),
-    skills:joi.array().items(joi.string()).min(1).max(5),
+    skills:joi.array().items(joi.string()).min(0).max(5),
 })
 
 const validateSignupData = (userData)=>{
@@ -50,6 +50,8 @@ const validateLoginData = (userData)=>{
 }
 
 const userProfileData = joi.object({
+    firstName:joi.string(),
+    lastName:joi.string(),
     age:joi.number(), 
     gender:joi.string(), 
     skills:joi.array().items(joi.string()).min(1).max(5),

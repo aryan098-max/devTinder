@@ -16,13 +16,13 @@ authRouter.post("/signup", async(req,res)=>{
 
     try{
         // extracting userData from req.body
-        const {firstName, lastName, emailId, password, skills, age, gender, about, photoURL} = req.body;
+        const {firstName, lastName, emailId, password} = req.body;
 
         // api data validation
         const {isValid, errorMessages} = validateSignupData(req.body);
 
         if(!isValid){
-            return res.status(400).send(errorMessages);
+            return res.status(400).json({message:errorMessages});
         }
 
         // Encrypt the password
@@ -34,17 +34,19 @@ authRouter.post("/signup", async(req,res)=>{
             lastName, 
             emailId,
             password:hashedPassword, 
-            skills, 
-            age, 
-            gender, 
-            about, 
-            photoURL
         })
 
         // saving in the database returns a promise
-        await user.save();
+        const savedUser = await user.save();
+
+        // send token wrapped around cookie
+        const token = await savedUser.getJWT();
+
+        // sending cookie
+        res.cookie("token",token,{expires:new Date(Date.now() + 60 * 60 * 24 * 1000)});
         
-        res.send("User successfully added in the database");
+        // sending user data back
+        res.json({message:"User added in the database", data:savedUser});
 
     } catch (err){
 
@@ -83,7 +85,9 @@ authRouter.post("/login", async(req,res)=>{
             // After successful login - Create JWT token
             res.cookie("token", token, {expires:new Date(Date.now() +  60 * 60 * 24* 1000)});
 
-          res.send("User loggedIn Successfully");
+            // seding the user
+            res.json({message:"User Logged In", data:user})
+
         } else {
             return res.status(400).json({message:"Wrong Credentials"});
         }
