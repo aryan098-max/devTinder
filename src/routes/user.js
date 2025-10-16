@@ -19,9 +19,9 @@ userRouter.get("/user/requests/received", userAuth, async(req,res)=>{
         const connectionRequests = await ConnectionRequest.find({
             toUserId: loggedInUser._id,
             status:"interested"
-        }).populate("toUserId", ["firstName","lastName"]).populate("fromUserId",["firstName","lastName"]);
+        }).populate("toUserId", ["firstName","lastName"]).populate("fromUserId",["firstName","lastName","age","gender","about","photoURL"]);
 
-        res.json({message:connectionRequests}); 
+        res.json({message:"Request Receieved", data:connectionRequests}); 
 
     } catch (err){
         
@@ -47,7 +47,9 @@ userRouter.get("/user/connections", userAuth, async(req,res)=>{
                 {toUserId:loggedInUser._id}
             ],
             status:"accepted"
-        }).populate("fromUserId",["firstName", "lastName"]).populate("toUserId",["firstName","lastName"]);
+        })
+        .populate("fromUserId",["firstName", "lastName", "age", "gender", "about", "photoURL"])
+        .populate("toUserId",["firstName","lastName", "age", "gender", "about", "photoURL"]);
 
         // Showing connections from both sender and receiver side
         const connections = userConnections.map((req)=>
@@ -104,7 +106,7 @@ userRouter.get("/feed", userAuth, async(req,res)=>{
                 {_id:{$nin:Array.from(hiddenUsers)}},
                 {_id:{$ne:loggedInUser._id}}
             ]
-        }).select("firstName lastName").skip(skip).limit(limit);
+        }).skip(skip).limit(limit);
 
         res.json({message:"List of User: ", data:users});
 
@@ -115,3 +117,5 @@ userRouter.get("/feed", userAuth, async(req,res)=>{
 })
 
 module.exports = userRouter;
+
+// feed - users

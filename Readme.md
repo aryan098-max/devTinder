@@ -138,6 +138,10 @@ Note:
 - Use of select for selecting specific field - .select("fromUserId toUserId");
 - .select(" ") takes only one argument; therefore, separate users with space
 
+const {page, limit} = req.query 
+
+// page parsed, const page = parseInt(page)
+
 # Pagination 
 - /feed?page=1&limit=10 => first 10 users 1-10 = .skip(0).limit(10)
 - /feed?page=2$limit=20 => 11-20 = .skip(10).limit(10)
@@ -146,3 +150,21 @@ Note:
 - For example, skip(0).limit(10) - skip 0 users and give me 10 users
 - skip formula = (page-1)*10;
 - .skip(skip).limit(limit) = chained on the search results, find(), findById()
+
+# CORS
+- Frontend is not allowed to make a api call to backend because both are running on different ports
+- To solve this error - Install a package name - cors and use it as a middleware
+- npm install cors, app.use(cors({add configuration}))
+- You must import it before using it
+- Add configuration for cookies as well
+- app.use(cors({
+    origin:"http://localhost:5173/login",
+    credentials:true,
+}))
+
+# Handling Token Not Valid
+- 401 status - Not authorized
+
+# Send user data from most of the apis
+
+# Set cookies during sign up as well

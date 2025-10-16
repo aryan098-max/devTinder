@@ -77,7 +77,7 @@ const userSchema = new Schema({
         type:[String],
         validate:{
             validator:function (arr){
-                return arr.length >=1 && arr.length <=5; // min=1, max=5
+                return arr.length >=0 && arr.length <=5; // min=1, max=5
             },
             message:"Limit is 5 Skills"
         }

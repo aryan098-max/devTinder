@@ -10,7 +10,7 @@ const userAuthentication = async (req, res, next)=>{
 
     // validating token
     if(!token){
-        return res.status(400).json({message:"Cookies Expired Login Again"});
+        return res.status(401).json({message:"Cookies Expired Login Again"});
     }
 
     const decodedMessage = await jwt.verify(token, "Ary@nSomen123");

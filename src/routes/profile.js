@@ -35,12 +35,11 @@ profileRouter.patch("/profile/edit", userAuthentication, async(req, res)=>{
         const {isValid, errorMessages} = validateProfileData(userData);
 
         if(!isValid){
-            console.log("Hello");
             return res.status(400).json({errors:errorMessages});
         }
 
         // Not Allowing Email update, Api Level Validation
-        const ALLOWED_UPDATES = ["age", "gender", "about", "skills","photoURL"];
+        const ALLOWED_UPDATES = ["firstName", "lastName", "age", "gender", "about", "skills","photoURL"];
 
         const isUpdateAllowed = Object.keys(userData).every(
             (k)=> ALLOWED_UPDATES.includes(k)
@@ -50,14 +49,15 @@ profileRouter.patch("/profile/edit", userAuthentication, async(req, res)=>{
             return res.status(400).json({message:"Not Allowed To Update Field"});
         }
 
-        // Update the database
+        // Update the database, using bracket Notation 
         Object.keys(userData).forEach((key)=>{
             loggedInUser[key] = userData[key];
         })
 
         await loggedInUser.save();
 
-        res.json({message:"User updated Successfully"});
+        // return data from here for front-end
+        res.json({message:"User updated Successfully", data:loggedInUser});
 
     } catch (err){
 
