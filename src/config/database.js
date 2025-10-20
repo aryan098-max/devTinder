@@ -4,7 +4,7 @@ const mongoose = require ('mongoose')
 const dbConnection = async () =>{
 
     try{
-        const URI = "mongodb+srv://aryangupta:AryanSomen123@namastenode.vhxclkg.mongodb.net/DevTinder";
+        const URI = process.env.DB_CONNECTION_SECRET
         await mongoose.connect(URI);
 
     } catch (err){

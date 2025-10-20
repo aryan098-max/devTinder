@@ -103,7 +103,7 @@ userSchema.methods.getJWT = function (){
 
     // user = this - user = instance of User model, :- this._id = user._id
     const user = this;
-    const token = jwt.sign({_id:user._id}, "Ary@nSomen123", {expiresIn:"1d"})
+    const token = jwt.sign({_id:user._id}, process.env.JWT_SECRET, {expiresIn:"1d"})
     return token;
 }
 

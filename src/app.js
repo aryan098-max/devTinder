@@ -2,7 +2,11 @@ const express = require('express');
 const app = express();
 const dbConnection = require("./config/database");
 const cookieParser = require('cookie-parser');
-const cors = require('cors')
+const cors = require('cors');
+const dotenv = require('dotenv');
+
+// configuring dotenv file
+dotenv.config();
 
 
 // middlewares
@@ -31,11 +35,11 @@ dbConnection()
 .then(()=>{
     console.log("Database Connection is established");
 
-    app.listen(7000, ()=>{
+    app.listen(process.env.PORT, ()=>{
         console.log("Server is running on Port 7000");
     })
 })
 .catch(err =>{
-    console.error("Database Connection Failed", err)
+    console.error("Database Connection Failed", err);
 })
 
