@@ -564,4 +564,3 @@ Go Back to Get Set up page
 # Last Step 
 - .env() file must be added in the .gitignore() 
 - In this way, the keys will be only inside our sys
-
