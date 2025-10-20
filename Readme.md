@@ -7,17 +7,38 @@
 6. nodemon - for script
 7. bcrypt - hashing password
 8. joi - api level validation
-9. 
+9. jsonwebtoken (json web token)
+10. cookie-parser (middleware for parsing cookie sent by the browser)
+11. joi-password-complexity
 
 - List of all the apis
 
-    # auth 
+    1. auth - authRouter
+    - POST /signup
+    - POST /login
+    - POST /logout
 
-    # userprofile
+    2. userprofile - profileRouter
+    - GET   /profile/view
+    - PATCH /profile/edit/:id
+    - DELETE /profile/:id
+    - PATCH /profile/password
+    
+    3. connections - connectionRequestRouter
+    - Total 4 status - interested, ignored, - interested - accepted or rejected
+    Note: Creating dynamic routes for interested or ignored, Same for accepted or rejected
+        
+    - /request/send/interested/:userId, /request/send/ignored/:userId 
+    = POST /request/send/:status/:userId
 
-    # connections
+    - /request/review/accepted/:requestId, /request/review/rejected/:requestId
+     = POST /request/review/:status/:requestId
 
-    # feed
+    4. feed - userRouter
+    - GET /user/requests/received - more clear
+    - GET /user/connections
+    - GET /user/feed - Gets you the profile of other users on platform
+
 
 - Create a src folder 
     - create config, middleware, app.js folders and file
@@ -42,10 +63,11 @@
         }, 
         message:"Email Id is not Valid"
   }
+  - Similarly, you can validation on photoURL and a lot of things
 
   - findByIdAndUpdate({_id:userId},req.body,{runValidators:true}), must do it on patch 
 
-# Update Validation 
+# Update_Method Validation 
 - If a user tries to update email prevent it using const ALLOWED_UPDATES = ["fields you want to update only"]
 - For checking userId - mongoose.Types.ObjectId.isValid(userId)
 - Use validate for putting restriction in skills count
@@ -55,3 +77,94 @@
 
 # Delete Route
 - use findByIdAndDelete(userId), Always Convert userId into userId.toString()
+
+# Envrypting Password using Bcrypt
+1. While saving {password:hashedPassword}
+2. await bcrypt.compare(userPassword, hashedPassword), Don't forget to add await
+
+# JWT (Json Web Token) && Cookie - INSTALL jsonwebtoken && cookie-parser, require both cookie-praser and jwt
+- Imp: cookie-parser is a middleware - used for parsing cookies, 
+- const cookieParser = require('cookie-parser'), app.use(cookieParser())
+- After succesfull login, create jwt token and wrap it inside cookie and send to the browser
+- Every time a user sends a api request jwt token is verified
+- This is the reason that a user can stay loggedIn in a website for weeks
+
+- Difference between expiresIn (token) and expire in cookie
+👉 JWT expiry = security check on the server
+👉 Cookie expiry = storage lifetime in the client (browser)
+
+Note:
+- Token creation is done using user schema methods
+- Token validation is done inside userAuth
+
+# Creating Separate Routes and Using Express Router
+- For each group of secific api - using same routes
+- Add edit/profile/password - routes own your own
+- Completed Auth & Profile Routes
+
+# Creating connection request schema && defining send request api
+- Creating Connection Request schema
+- Defining - /request/send/:status/:toUserId
+- Add all the validations (cover all the corner cases)
+- Use of complex queries: $or[{},{}]
+
+# Indexing in the schema
+- Indexing makes find/search operations faster, queries would be faster
+- Note: unique:true, automatically creates index
+- Complex queries make operations slow; therefore, use compound index. Created inside schema
+- conectionRequsetSchema.index({fromUserId:1, toUserId:1})
+
+# Creating review request api
+- Defining review request api - /request/review/:status/:requestId
+- Convered all the corner cases 
+
+# Creaing and Defining userRouter & Creating relation between two collections using ref field
+- Defning userRouter, 1. /user/requests/received
+- Populating api - using ref (establishing relationship between user & connectionRequest collection)
+- toUserId & fromUserId - replaced with user data - because of ref = estalished connection
+
+# Install joi-password-complexity
+- npm install joi-password-complexity
+- As validate function was not working because of hashing; therefore, using joi-password-complexity
+- Note: schema validation works before the data is being saved.
+
+# Create user connection api 
+- /user/connections - give all the "accepted connections'
+- Make sure that connection fromUserId toUserId both are visible, A->B, C-A, D->A
+
+# Feed Api, Use of complex queries $and, $or, $nin, $ne && Pagination 
+- Defining user's feed api - /feed
+- Use complex queries - for easy manipulation of Database collection
+- Use of select for selecting specific field - .select("fromUserId toUserId");
+- .select(" ") takes only one argument; therefore, separate users with space
+
+const {page, limit} = req.query 
+
+// page parsed, const page = parseInt(page)
+
+# Pagination 
+- /feed?page=1&limit=10 => first 10 users 1-10 = .skip(0).limit(10)
+- /feed?page=2$limit=20 => 11-20 = .skip(10).limit(10)
+- function for pagination - for skipping  & limiting users - .skip() & .limit()
+- skip() - how many users you want to skip from the start
+- For example, skip(0).limit(10) - skip 0 users and give me 10 users
+- skip formula = (page-1)*10;
+- .skip(skip).limit(limit) = chained on the search results, find(), findById()
+
+# CORS
+- Frontend is not allowed to make a api call to backend because both are running on different ports
+- To solve this error - Install a package name - cors and use it as a middleware
+- npm install cors, app.use(cors({add configuration}))
+- You must import it before using it
+- Add configuration for cookies as well
+- app.use(cors({
+    origin:"http://localhost:5173/login",
+    credentials:true,
+}))
+
+# Handling Token Not Valid
+- 401 status - Not authorized
+
+# Send user data from most of the apis
+
+# Set cookies during sign up as well

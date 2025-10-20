@@ -16,8 +16,12 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "express": "^5.1.0",
     "joi": "^18.0.1",
+    "joi-password-complexity": "^5.2.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.0",
     "node.js": "^0.0.1-security",
     "nodemon": "^3.1.10",

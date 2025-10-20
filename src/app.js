@@ -1,142 +1,29 @@
 const express = require('express');
 const app = express();
 const dbConnection = require("./config/database");
-const mongoose = require('mongoose');
-const bcrypt = require("bcrypt");
+const cookieParser = require('cookie-parser');
+const cors = require('cors')
 
-// Importing models
-const Admin = require("./models/admin");
-const User = require("./models/user");
-
-// importing adminAuth middleware
-const adminAuth = require("./middlewares/adminAuth")
-
-// validation
-const {validateAdminData, validateUserData} = require("./valdiation/validation");
 
 // middlewares
 app.use(express.json());
+app.use(cookieParser());
+app.use(cors({
+    origin:"http://localhost:5173",
+    credentials:true
+}));
 
-app.post("/admin/auth/login", adminAuth, (req, res)=>{
+// Importing Routes
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/request");
+const userRouter = require("./routes/user");
 
-    // validate loginData 
-    const adminData = req.body;
-
-    const {isValid, errorMessages} = validateAdminData(adminData);
-    if(!isValid){
-        return res.status.json({message:errorMessages});
-    }
-
-    // user exists
-    const admin = Admin.findOne({email:email})
-    if(!admin){
-        return res.status(401).json({message:"Invalid Credentials"})
-    }
-
-    // verify password
-    const isPasswordMatch = bcrypt.compare(admin.password, adminData.password)
-
-    // checking role
-      if (admin.role !== 'admin') return res.status(403).json({ error: 'Access denied' });
-
-    // Generate JWT
-    const token = jwt.sign(
-        { id: admin._id, role: admin.role },
-        JWT_SECRET,
-        { expiresIn: '1h' }
-    );
-
-  res.json({ token, role: admin.role, message: 'Admin login successful' });
-
-})
-
-app.post("/signup", async(req,res)=>{
-
-    try{
-        // extracting userData from req.body
-        const userData = req.body;
-
-        // api data validation
-        const {isValid, errorMessages} = validateUserData(userData);
-
-        if(!isValid){
-            return res.status(400).send(errorMessages);
-        }
-        
-        // creating a new user
-        const user = new User(userData)
-
-        // saving in the database returns a promise
-        await user.save();
-        
-        res.send("User successfully added in the database");
-
-    } catch (err){
-
-        res.status(400).send("Error Occurred" + err.message);
-    }
-})
-
-app.patch("/user/:id", async(req, res)=>{
-    
-    try{
-        const userData = req.body;
-        const {id}= req.params;
-
-        // validating userId
-        if(!mongoose.Types.ObjectId.isValid(id)){
-              return res.status(400).send("Invalid User ID");
-        }
-
-        // Not Allowing Email update
-        const ALLOWED_UPDATES = ["age", "gender", "about", "skills"];
-
-        const isUpdateAllowed = Object.keys(userData).every(
-            (k)=> ALLOWED_UPDATES.includes(k)
-        );
-
-        if(!isUpdateAllowed){
-            return res.status(400).send("Update Not Allowed");
-        }
-
-        // finding User and Update
-        const user = await User.findByIdAndUpdate({_id:id}, userData, {runValidators:true});
-
-        // User Doesn't Exists
-        if(!user){
-            return res.json(404).json({message:"User Not Found"});
-        }
-
-        res.json({message:"User updated Successfully"});
-
-    } catch (err){
-
-        res.status(400).send("Error Occured" + err.message);
-    }
-})
-
-app.delete("/user/:id",async (req,res)=>{
-
-    try{
-        
-    const {id} = req.params;
-    const userId = id.toString();
-    
-    // finding User and Delete
-      const deletedUser = await User.findByIdAndDelete({_id:userId});
-
-      if(!deletedUser){
-        return res.status(404).send("User Not Found");
-      }
-
-        res.send("User deleted Successfully");
-
-    } catch (err){
-
-        res.status(400).send("Error Occured" + err.message);
-
-    }
-})
+// Using routes middleware
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
+app.use("/", userRouter);
 
 
 // Database Connection 
